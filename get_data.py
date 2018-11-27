@@ -99,12 +99,12 @@ def cifar_to_rgb(cifar_img):
     return rgb
 
 # example of how to use the get function
-#test_imgs, test_lbls, test_lbls_str = get_data(img_dataset_test_path)
-#print(test_imgs.shape, test_lbls.shape)
-#for i in range(0, 10):
+test_imgs, test_lbls, test_lbls_str = get_data(img_dataset_train_path)
+#print(test_imgs.shape, test_lbls.shape, test_lbls_str.shape)
+#for i in range(0, 20):
 #    print(test_lbls[i], test_lbls_str[i])
 #print()
-
+#print(test_lmgs[1])
 # display some examples
 #for j in range(10, 20):
 #    img = cifar_to_rgb(test_imgs[j])
