@@ -10,6 +10,7 @@ import get_data as gd
 import loss_func as lf
 import reg_func as rf
 import numpy as np
+import string
 
 #hyperparameters
 l=1 #lambda
@@ -28,24 +29,24 @@ class BasicLinearClassifier:
         numimgsperblock = (int)(imgs.shape[0]/kfoldnum)
         blockimg = np.zeros((numimgsperblock,imgs.shape[1]))
         blocklbl = np.zeros((numimgsperblock,1))
-        #blocklblstr = np.zeros((numimgsperblock,1))
+        blocklblstr = np.zeros((numimgsperblock))
         kfoldimg = np.zeros((kfoldnum,numimgsperblock,imgs.shape[1]))
         kfoldlbl = np.zeros((kfoldnum,numimgsperblock,1))
-        #kfoldlblstr = np.zeros((kfoldnum,numimgsperblock,1))
+        kfoldlblstr = np.zeros((kfoldnum,numimgsperblock))
 
-        while i<kfoldnum+1:
+        while i < kfoldnum+1:
             while j < i*numimgsperblock:
-                blockimg[j,:] = imgs[j,:]
-                blocklbl[j] = labels[j]
-                #blocklblstr[j] = labelstr[j]
+                blockimg[j-((i-1)*numimgsperblock),:] = imgs[j,:]
+                blocklbl[j-((i-1)*numimgsperblock)] = labels[j]
+                blocklblstr[j-((i-1)*numimgsperblock)] = labelstr[j]
                 j += 1
-            j=0
-            i+=1
+
             print(blockimg.shape)
-            kfoldimg[i] = blockimg
-            kfoldlbl[i] = blocklbl
-            #kfoldlblstr[i] = blocklblstr
-        return kfoldimg,kfoldlbl#,kfoldlblstr
+            kfoldimg[i-1] = blockimg
+            kfoldlbl[i-1] = blocklbl
+            kfoldlblstr[i-1] = blocklblstr
+            i += 1
+        return kfoldimg,kfoldlbl,kfoldlblstr
 
     def validate(self,X,Y,W): #same as train, but is used to optimize your hyperparameters
         i=0
