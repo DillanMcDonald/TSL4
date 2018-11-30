@@ -6,6 +6,7 @@ Date created: 11-25-18
 Description:
 A basic Linear Classifier for image processing
 """
+
 import get_data as gd
 import loss_func as lf
 import reg_func as rf
@@ -28,11 +29,11 @@ class BasicLinearClassifier:
         j=0
         numimgsperblock = (int)(imgs.shape[0]/kfoldnum)
         blockimg = np.zeros((numimgsperblock,imgs.shape[1]))
-        blocklbl = np.zeros((numimgsperblock,1))
-        blocklblstr = np.zeros((numimgsperblock))
+        blocklbl = np.zeros((numimgsperblock))
+        blocklblstr = np.empty((numimgsperblock),str)
         kfoldimg = np.zeros((kfoldnum,numimgsperblock,imgs.shape[1]))
-        kfoldlbl = np.zeros((kfoldnum,numimgsperblock,1))
-        kfoldlblstr = np.zeros((kfoldnum,numimgsperblock))
+        kfoldlbl = np.zeros((kfoldnum,numimgsperblock))
+        kfoldlblstr = np.empty((kfoldnum,numimgsperblock),str)
 
         while i < kfoldnum+1:
             while j < i*numimgsperblock:
@@ -41,7 +42,7 @@ class BasicLinearClassifier:
                 blocklblstr[j-((i-1)*numimgsperblock)] = labelstr[j]
                 j += 1
 
-            print(blockimg.shape)
+            #print(blockimg.shape)
             kfoldimg[i-1] = blockimg
             kfoldlbl[i-1] = blocklbl
             kfoldlblstr[i-1] = blocklblstr
@@ -60,14 +61,16 @@ class BasicLinearClassifier:
         percent_correct = correct/X.shape[0]
         return percent_correct
 
-    def train(self,X,Y): #input the kfold sets here
+    def train(self,X,Y,W): #input the kfold sets here
         i=0
-        print(X)
+        #print(Y)
         xlen = X.shape[1]
-        W = np.ones((xlen , 100))
-        loss,dw = lf.svm_loss_vectorized(W,X,Y,rf.l2_reg(W,l))
+        #W = np.ones((xlen , 100))
+        loss,dw = lf.svm_loss(W,X,Y.astype(int),rf.l2_reg(W,l))
         print("Overall Model Loss: ",loss)
-        return W+dw    #training returns the optimum weights
+        W= np.add(W,dw)
+        #print(W.shape)
+        return W    #training returns the optimum weights
 
     def batchtest(self,X,Y,W): #where X is the data the images, Y is the correct Label, and W is the weights
         i=0
@@ -90,7 +93,8 @@ def main():
     kfoldimg,kfoldlbl,kfoldlblstr = test.split_train_data(all_train_imgs,all_train_lbls,all_train_lbls_str,kfoldnum)
     i=0
     j=0
-    W =np.zeros(kfoldnum)
+    #print(all_train_imgs.shape[1])
+    W = np.ones((kfoldnum,all_train_imgs.shape[1],100))
     Wf =np.zeros(kfoldnum)
     while i < kfoldnum :
         validate_set_img = kfoldimg[i]
@@ -98,7 +102,8 @@ def main():
         #validate_set_lbl_str = kfoldlblstr[i]
         while j < kfoldnum :
             if j!=i :
-                W[j] = test.train(kfoldimg[j],kfoldlbl[j])
+                W[j] = test.train(kfoldimg[j],kfoldlbl[j],W[j])
+
             else :
                 W[j]=0;
             j+=1
