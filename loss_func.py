@@ -21,9 +21,9 @@ def svm_loss(W, X, y, reg): #Inputs are matricies
   num_train = X.shape[0]
   scores = X.dot(W)
   yi_scores = scores[np.arange(scores.shape[0]),y]
-  print(W)
-  print(y)
-  print(yi_scores)
+  #print(W)
+  #print(y)
+  #print(yi_scores)
   margins = np.maximum(0, scores - np.matrix(yi_scores).T + 1)
   margins[np.arange(num_train),y] = 0
   loss = np.mean(np.sum(margins, axis=1))

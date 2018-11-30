@@ -58,17 +58,18 @@ class BasicLinearClassifier:
             #print(Y[prediction_index])
             if Y[i] == Y[prediction_index]:
                 correct +=1
+            i+=1
         percent_correct = correct/X.shape[0]
         return percent_correct
 
-    def train(self,X,Y,W): #input the kfold sets here
+    def train(self,X,Y,W, lr=1e-6): #input the kfold sets here
         i=0
         #print(Y)
         xlen = X.shape[1]
         #W = np.ones((xlen , 100))
         loss,dw = lf.svm_loss(W,X,Y.astype(int),rf.l2_reg(W,l))
         print("Overall Model Loss: ",loss)
-        W= np.add(W,dw)
+        W= np.add(W, lr * dw * -1)
         #print(W.shape)
         return W    #training returns the optimum weights
 
@@ -100,15 +101,16 @@ def main():
         validate_set_img = kfoldimg[i]
         validate_set_lbl = kfoldlbl[i]
         #validate_set_lbl_str = kfoldlblstr[i]
-        while j < kfoldnum :
-            if j!=i :
-                W[j] = test.train(kfoldimg[j],kfoldlbl[j],W[j])
-
+        while j < kfoldnum:
+            if j!=i:
+                print("Set ", j)
+                W[j] = test.train(kfoldimg[j],kfoldlbl[j],W[j-1])
             else :
                 W[j]=0;
-            j+=1
+            j += 1
         Wf[i] = np.sum(W)/(kfoldnum-1)
-        print("Batch ",i," Performance: ",test.validate(validate_set_img,validate_set_lbl,Wf[i])*100)
+        #print("Batch ",i," Performance: ",test.validate(validate_set_img,validate_set_lbl,Wf[i])*100)
+
         i+=1
 
 if __name__ == '__main__':
